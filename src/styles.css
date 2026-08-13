@@ -1,0 +1,168 @@
+/* ---------- Токены ---------- */
+:root {
+  --night: #0e1424;
+  --night-2: #182242;
+  --night-3: #232f57;
+  --parchment: #ece3d2;
+  --parchment-2: #f7f1e3;
+  --ink: #3b3323;
+  --ink-soft: #6f6350;
+  --gold: #d3bc8e;
+  --gold-bright: #f6e7bd;
+  --gold-deep: #a8894f;
+  --teal: #5b9aa8;
+
+  --frame: 2px;
+  --radius: 4px;
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --shadow-panel: 0 24px 60px -24px rgba(0, 0, 0, 0.75);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background: var(--night);
+  color: var(--parchment);
+  font-family: 'Spectral', Georgia, serif;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+#app {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* ---------- Типографика ---------- */
+.display {
+  font-family: 'Cormorant', Georgia, serif;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.eyebrow {
+  font-size: 0.68rem;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--gold-deep);
+}
+
+/* ---------- Кнопки ---------- */
+.btn {
+  font-family: 'Spectral', Georgia, serif;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  padding: 0.85rem 2.2rem;
+  border-radius: 999px;
+  border: 1px solid var(--gold-deep);
+  background: linear-gradient(170deg, #f3e3ba 0%, #d9c493 46%, #bfa367 100%);
+  color: #2a2312;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease),
+    filter 0.25s var(--ease);
+  box-shadow: 0 6px 18px -8px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.75) 50%,
+    transparent 65%
+  );
+  transform: translateX(-120%);
+  transition: transform 0.7s var(--ease);
+}
+
+.btn:hover:not(:disabled)::after {
+  transform: translateX(120%);
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px -10px rgba(0, 0, 0, 0.8),
+    0 0 26px -6px rgba(246, 231, 189, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn:disabled {
+  filter: grayscale(0.55) brightness(0.85);
+  cursor: not-allowed;
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid rgba(211, 188, 142, 0.4);
+  color: var(--gold);
+  box-shadow: none;
+  padding: 0.7rem 1.5rem;
+  font-size: 0.9rem;
+}
+
+.btn-ghost::after {
+  display: none;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  border-color: var(--gold);
+  color: var(--gold-bright);
+  box-shadow: none;
+  transform: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--gold-bright);
+  outline-offset: 3px;
+}
+
+/* ---------- Переходы шагов ---------- */
+.step-enter-active,
+.step-leave-active {
+  transition: opacity 0.4s var(--ease), transform 0.4s var(--ease),
+    filter 0.4s var(--ease);
+}
+
+.step-enter-from {
+  opacity: 0;
+  transform: translateY(14px);
+  filter: blur(2px);
+}
+
+.step-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+  filter: blur(2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
