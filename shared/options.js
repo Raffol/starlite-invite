@@ -92,6 +92,7 @@ export const DRINK_CUSTOM_LIMIT = 80
 // Фиксированные детали вечера: показываются на титуле и на финальном экране.
 export const DATE_LABEL = 'Воскресенье'
 export const TIME_LABEL = '18:20'
+export const DRESS_CODE = 'Красивый'
 
 function find(list, id) {
   return list.find((item) => item.id === id) || null
