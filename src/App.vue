@@ -6,11 +6,14 @@ import ChoiceCard from './components/ChoiceCard.vue'
 import WishBurst from './components/WishBurst.vue'
 import {
   DINNERS,
+  SOUPS,
+  SOUP_DINNER_ID,
   DRINK_KINDS,
   DRINKS,
   DINNER_CUSTOM_LIMIT,
   DRINK_NOTE_LIMIT,
   dinnerLabel,
+  soupLabel,
   drinkLabel,
   drinkKindLabel,
 } from '../shared/options.js'
@@ -21,6 +24,7 @@ const TOTAL_STEPS = 2
 const step = ref(0)
 
 const dinner = ref('')
+const soup = ref('')
 const dinnerCustom = ref('')
 const drinkKind = ref('')
 const drink = ref('')
@@ -42,6 +46,13 @@ function pickDinner(id) {
   dinnerCustom.value = ''
 }
 
+// Суп без уточнения не считается выбранным.
+const needsSoup = computed(() => dinner.value === SOUP_DINNER_ID)
+
+watch(dinner, (id) => {
+  if (id !== SOUP_DINNER_ID) soup.value = ''
+})
+
 watch(dinnerCustom, (value) => {
   if (value.trim()) dinner.value = ''
 })
@@ -49,8 +60,10 @@ watch(dinnerCustom, (value) => {
 const customDinner = computed(() => dinnerCustom.value.trim())
 
 const canContinue = computed(() => {
-  if (STEPS[step.value] === 'dinner')
+  if (STEPS[step.value] === 'dinner') {
+    if (needsSoup.value) return !!soup.value
     return !!dinner.value || customDinner.value.length >= 2
+  }
   if (STEPS[step.value] === 'drinks') return !!drinkKind.value && !!drink.value
   return true
 })
@@ -58,9 +71,11 @@ const canContinue = computed(() => {
 const summary = computed(() => [
   {
     label: 'Ужин',
-    value: dinner.value
-      ? dinnerLabel(dinner.value)
-      : `${customDinner.value} — свой вариант`,
+    value: needsSoup.value
+      ? `Суп — ${(soupLabel(soup.value) || '').toLowerCase()}`
+      : dinner.value
+        ? dinnerLabel(dinner.value)
+        : `${customDinner.value} — свой вариант`,
   },
   {
     label: 'Напитки',
@@ -92,6 +107,7 @@ async function send() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         dinner: dinner.value,
+        soup: soup.value,
         dinnerCustom: customDinner.value,
         drinkKind: drinkKind.value,
         drink: drink.value,
@@ -153,7 +169,7 @@ async function send() {
           </div>
           <h1 class="display title-xl center">Ужин под звёздами</h1>
           <p class="lede center">
-            Вечер уже задуман. Осталось два вопроса — ужин и напитки, —
+            Вечер уже продуман. Осталось два вопроса - ужин и напитки -
             остальное я беру на себя.
           </p>
           <div class="actions center-actions">
@@ -177,6 +193,23 @@ async function send() {
               @select="pickDinner(opt.id)"
             />
           </div>
+
+          <Transition name="step">
+            <div v-if="needsSoup" class="sub">
+              <p class="eyebrow sub-label">Какой суп?</p>
+              <div class="list">
+                <ChoiceCard
+                  v-for="opt in SOUPS"
+                  :key="opt.id"
+                  :title="opt.title"
+                  :subtitle="opt.subtitle"
+                  :glyph="opt.glyph"
+                  :selected="soup === opt.id"
+                  @select="soup = opt.id"
+                />
+              </div>
+            </div>
+          </Transition>
 
           <div class="sub">
             <label class="field">
@@ -279,7 +312,7 @@ async function send() {
           <WishBurst />
           <h2 class="display title-md center">Ответ отправлен</h2>
           <p class="lede center on-night">
-            Уведомление уже у меня. Место, столик и время — моя забота,
+            Уведомление уже у меня. Место, столик и время - моя забота,
             про день напишу отдельно. Тебе останется только прийти.
           </p>
           <p class="signoff center">До встречи под звёздами ✦</p>

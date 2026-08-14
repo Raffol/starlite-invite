@@ -1,7 +1,9 @@
 import {
   DINNER_CUSTOM_LIMIT,
+  SOUP_DINNER_ID,
   DRINK_NOTE_LIMIT,
   dinnerLabel,
+  soupLabel,
   drinkLabel,
   drinkKindLabel,
   dayLabel,
@@ -42,8 +44,8 @@ export default async function handler(req, res) {
     return res.status(405).json({ ok: false, error: 'Нужен POST-запрос' })
   }
 
-  const token = process.env.TELEGRAM_BOT_TOKEN
-  const chatIds = (process.env.TELEGRAM_CHAT_ID || '')
+  const token = process.env.8984819124:AAGK6m_atI9HOUunw-G2sjjgAv3HYFN_0Mc
+  const chatIds = (process.env.912419291 || '')
     .split(',')
     .map((id) => id.trim())
     .filter(Boolean)
@@ -67,9 +69,13 @@ export default async function handler(req, res) {
 
   // Клиент присылает только id — текст сообщения собирается здесь.
   const customDinner = trim(body.dinnerCustom, DINNER_CUSTOM_LIMIT)
-  // Либо один из известных вариантов, либо её собственный текст.
-  const dinner = dinnerLabel(body.dinner) ||
-    (customDinner.length >= 2 ? `${customDinner} (свой вариант)` : null)
+  // Суп требует уточнения, иначе — известный вариант либо её собственный текст.
+  const soup = soupLabel(body.soup)
+  const dinner =
+    body.dinner === SOUP_DINNER_ID
+      ? soup && `Суп — ${soup.toLowerCase()}`
+      : dinnerLabel(body.dinner) ||
+        (customDinner.length >= 2 ? `${customDinner} (свой вариант)` : null)
   const kind = drinkKindLabel(body.drinkKind)
   const drink = drinkLabel(body.drinkKind, body.drink)
   const day = dayLabel(body.day) // необязательно: шага с датой в потоке нет

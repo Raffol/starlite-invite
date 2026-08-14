@@ -27,6 +27,24 @@ export const DINNERS = [
     subtitle: 'Сытно и по-домашнему',
     glyph: '🍗',
   },
+  {
+    id: 'soup',
+    title: 'Суп',
+    subtitle: 'Горячее в начале вечера',
+    glyph: '🍲',
+  },
+]
+
+// У супа есть уточнение: выбрав карточку, нужно указать какой.
+export const SOUP_DINNER_ID = 'soup'
+
+// Без подписей: названия говорят за себя.
+export const SOUPS = [
+  { id: 'solyanka', title: 'Солянка', glyph: '🫒' },
+  { id: 'rassolnik', title: 'Рассольник', glyph: '🥒' },
+  { id: 'soup-fish', title: 'Рыбный', glyph: '🐟' },
+  { id: 'soup-chicken', title: 'Куриный', glyph: '🍗' },
+  { id: 'soup-plain', title: 'Обычный', glyph: '🥣' },
 ]
 
 export const DRINK_KINDS = [
@@ -78,6 +96,11 @@ function find(list, id) {
 export function dinnerLabel(id) {
   const d = find(DINNERS, id)
   return d ? `${d.title} — ${d.subtitle.toLowerCase()}` : null
+}
+
+export function soupLabel(id) {
+  const s = find(SOUPS, id)
+  return s ? s.title : null
 }
 
 export function drinkKindLabel(id) {
