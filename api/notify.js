@@ -225,8 +225,8 @@ export default async function handler(req, res) {
     return res.status(405).json({ ok: false, error: 'Нужен POST-запрос' })
   }
 
-  const token = process.env.8984819124:AAGK6m_atI9HOUunw-G2sjjgAv3HYFN_0Mc
-  const chatIds = (process.env.912419291 || '')
+  const token = process.env.TELEGRAM_BOT_TOKEN
+  const chatIds = (process.env.TELEGRAM_CHAT_ID || '')
     .split(',')
     .map((id) => id.trim())
     .filter(Boolean)
