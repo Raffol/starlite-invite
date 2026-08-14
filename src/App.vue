@@ -11,7 +11,9 @@ import {
   DRINK_KINDS,
   DRINKS,
   DINNER_CUSTOM_LIMIT,
-  DRINK_NOTE_LIMIT,
+  DRINK_CUSTOM_LIMIT,
+  DATE_LABEL,
+  TIME_LABEL,
   dinnerLabel,
   soupLabel,
   drinkLabel,
@@ -28,17 +30,35 @@ const soup = ref('')
 const dinnerCustom = ref('')
 const drinkKind = ref('')
 const drink = ref('')
-const drinkNote = ref('')
+const drinkCustom = ref('')
 
 const sending = ref(false)
 const error = ref('')
 
 const drinkOptions = computed(() => (drinkKind.value ? DRINKS[drinkKind.value] : []))
 
-watch(drinkKind, (kind) => {
+watch(drinkKind, () => {
   drink.value = ''
-  if (kind !== 'alcohol') drinkNote.value = ''
+  drinkCustom.value = ''
 })
+
+// Тот же принцип, что у ужина: карточка либо своё поле, но не оба сразу.
+function pickDrink(id) {
+  drink.value = id
+  drinkCustom.value = ''
+}
+
+watch(drinkCustom, (value) => {
+  if (value.trim()) drink.value = ''
+})
+
+const customDrink = computed(() => drinkCustom.value.trim())
+
+const drinkPlaceholder = computed(() =>
+  drinkKind.value === 'alcohol'
+    ? 'Например: апероль шприц или что-то местное'
+    : 'Например: морс, кола или свежий сок',
+)
 
 // Карточка и своё поле исключают друг друга: ответ всегда один.
 function pickDinner(id) {
@@ -64,7 +84,10 @@ const canContinue = computed(() => {
     if (needsSoup.value) return !!soup.value
     return !!dinner.value || customDinner.value.length >= 2
   }
-  if (STEPS[step.value] === 'drinks') return !!drinkKind.value && !!drink.value
+  if (STEPS[step.value] === 'drinks')
+    return (
+      !!drinkKind.value && (!!drink.value || customDrink.value.length >= 2)
+    )
   return true
 })
 
@@ -79,13 +102,16 @@ const summary = computed(() => [
   },
   {
     label: 'Напитки',
-    value: [drinkLabel(drinkKind.value, drink.value), drinkKindLabel(drinkKind.value)]
+    value: [
+      drink.value
+        ? drinkLabel(drinkKind.value, drink.value)
+        : `${customDrink.value} — свой вариант`,
+      drinkKindLabel(drinkKind.value),
+    ]
       .filter(Boolean)
       .join(' · '),
   },
-  ...(drinkNote.value.trim()
-    ? [{ label: 'Уточнение к алкоголю', value: drinkNote.value.trim() }]
-    : []),
+  { label: 'Когда', value: `${DATE_LABEL}, к ${TIME_LABEL}` },
 ])
 
 function next() {
@@ -111,7 +137,7 @@ async function send() {
         dinnerCustom: customDinner.value,
         drinkKind: drinkKind.value,
         drink: drink.value,
-        drinkNote: drinkNote.value.trim(),
+        drinkCustom: customDrink.value,
       }),
     })
     const isJson = (res.headers.get('content-type') || '').includes('json')
@@ -173,9 +199,13 @@ async function send() {
           </div>
           <h1 class="display title-xl center">Ужин под звёздами</h1>
           <p class="lede center">
-            Вечер уже продуман. Осталось два вопроса: ужин и напитки.
-            Остальное я беру на себя.
+            Вечер уже задуман. Осталось два вопроса — ужин и напитки, —
+            остальное я беру на себя.
           </p>
+          <div class="when">
+            <p class="eyebrow">Когда</p>
+            <p class="when-value">{{ DATE_LABEL }}, будь готова к {{ TIME_LABEL }}</p>
+          </div>
           <div class="actions center-actions">
             <button class="btn" @click="next">Открыть приглашение</button>
           </div>
@@ -185,8 +215,8 @@ async function send() {
         <OrnatePanel v-else-if="STEPS[step] === 'dinner'" key="dinner" class="panel-wrap">
           <p class="eyebrow">Шаг 1 из 2 · Ужин</p>
           <h2 class="display title-md">Что бы ты хотела на ужин?</h2>
-          <p class="hint">Выбери из идей ниже или напиши своими словами.</p>
-          <div class="list">
+          <p class="hint">Выбери из идей ниже <em>или</em> напиши своими словами — что-то одно.</p>
+          <div class="list" :class="{ 'is-muted': customDinner.length > 0 }">
             <ChoiceCard
               v-for="opt in DINNERS"
               :key="opt.id"
@@ -215,9 +245,9 @@ async function send() {
             </div>
           </Transition>
 
-          <div class="sub">
+          <div class="sub" :class="{ 'is-muted': !!dinner }">
             <label class="field">
-              <span class="eyebrow">Или напиши, чего хочется</span>
+              <span class="eyebrow">Или напиши, чего хочется (по желанию)</span>
               <textarea
                 v-model="dinnerCustom"
                 class="input textarea"
@@ -239,7 +269,7 @@ async function send() {
         <OrnatePanel v-else-if="STEPS[step] === 'drinks'" key="drinks" class="panel-wrap">
           <p class="eyebrow">Шаг 2 из 2 · Напитки</p>
           <h2 class="display title-md">Что будем пить?</h2>
-          <p class="hint">Оба варианта одинаково хороши.</p>
+          <p class="hint">Сначала вид, потом карточка <em>или</em> своё поле.</p>
           <div class="list two">
             <ChoiceCard
               v-for="opt in DRINK_KINDS"
@@ -255,7 +285,7 @@ async function send() {
           <Transition name="step">
             <div v-if="drinkKind" class="sub">
               <p class="eyebrow sub-label">Уточним</p>
-              <div class="list">
+              <div class="list" :class="{ 'is-muted': customDrink.length > 0 }">
                 <ChoiceCard
                   v-for="opt in drinkOptions"
                   :key="opt.id"
@@ -263,21 +293,24 @@ async function send() {
                   :subtitle="opt.subtitle"
                   :glyph="opt.glyph"
                   :selected="drink === opt.id"
-                  @select="drink = opt.id"
+                  @select="pickDrink(opt.id)"
                 />
               </div>
 
-              <label v-if="drinkKind === 'alcohol'" class="field field-tight">
-                <span class="eyebrow">Что именно налить? (по желанию)</span>
+              <label
+                class="field field-tight"
+                :class="{ 'is-muted': !!drink }"
+              >
+                <span class="eyebrow">Или напиши, что налить (по желанию)</span>
                 <input
-                  v-model="drinkNote"
+                  v-model="drinkCustom"
                   type="text"
                   class="input"
-                  :maxlength="DRINK_NOTE_LIMIT"
-                  placeholder="Например: сухое красное или апероль шприц"
+                  :maxlength="DRINK_CUSTOM_LIMIT"
+                  :placeholder="drinkPlaceholder"
                 />
                 <span class="counter">
-                  {{ drinkNote.length }} / {{ DRINK_NOTE_LIMIT }}
+                  {{ drinkCustom.length }} / {{ DRINK_CUSTOM_LIMIT }}
                 </span>
               </label>
             </div>
@@ -316,8 +349,8 @@ async function send() {
           <WishBurst />
           <h2 class="display title-md center">Ответ отправлен</h2>
           <p class="lede center on-night">
-            Уведомление уже у меня. Место, столик и время — моя забота,
-            про день напишу отдельно. Тебе останется только прийти.
+            Уведомление уже у меня. Место и столик — моя забота.
+            От тебя нужно одно: {{ DATE_LABEL.toLowerCase() }}, быть готовой к {{ TIME_LABEL }}.
           </p>
           <p class="signoff center">До встречи под звёздами ✦</p>
         </OrnatePanel>
@@ -479,6 +512,40 @@ async function send() {
 
 .sub-label {
   margin: 0 0 0.7rem;
+}
+
+/* Неактивная половина выбора: видно, что сработает что-то одно */
+.is-muted {
+  opacity: 0.45;
+  transition: opacity 0.3s var(--ease);
+}
+
+.is-muted:hover,
+.is-muted:focus-within {
+  opacity: 1;
+}
+
+/* Дата вечера на титуле */
+.when {
+  margin: 1.6rem auto 0;
+  padding-top: 1.2rem;
+  border-top: 1px solid rgba(168, 137, 79, 0.3);
+  max-width: 22rem;
+  text-align: center;
+}
+
+.when-value {
+  font-family: 'Cormorant', Georgia, serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin: 0.35rem 0 0;
+  color: var(--ink);
+}
+
+.hint em {
+  font-style: normal;
+  color: var(--gold-deep);
+  font-weight: 600;
 }
 
 /* Поля */
