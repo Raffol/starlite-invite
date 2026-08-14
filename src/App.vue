@@ -14,6 +14,7 @@ import {
   DRINK_CUSTOM_LIMIT,
   DATE_LABEL,
   TIME_LABEL,
+  DRESS_CODE,
   dinnerLabel,
   soupLabel,
   drinkLabel,
@@ -349,6 +350,8 @@ async function send() {
           <div class="when on-night">
             <p class="eyebrow">Когда</p>
             <p class="when-value">{{ DATE_LABEL }}, будь готова к {{ TIME_LABEL }}</p>
+            <p class="eyebrow when-gap">Дресс-код</p>
+            <p class="when-value">{{ DRESS_CODE }}</p>
           </div>
           <p class="signoff center">До встречи ✦</p>
         </OrnatePanel>
