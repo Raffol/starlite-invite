@@ -39,7 +39,7 @@ export const CATALOG = {
   },
   limits: {
     dinnerCustom: 300,
-    drinkNote: 80,
+    drinkCustom: 80,
   },
 }
 
@@ -135,25 +135,24 @@ export default async function handler(req, res) {
         (customDinner.length >= 2 ? `${customDinner} (свой вариант)` : null)
 
   const kind = CATALOG.drinkKinds[body.drinkKind] || null
-  const drink = (CATALOG.drinks[body.drinkKind] || {})[body.drink] || null
+  // Напиток — либо из списка, либо её собственный текст.
+  const customDrink = trim(body.drinkCustom, CATALOG.limits.drinkCustom)
+  const knownDrink = (CATALOG.drinks[body.drinkKind] || {})[body.drink] || null
+  const drink = knownDrink || (customDrink.length >= 2 ? customDrink : null)
+  const drinkIsCustom = !knownDrink && !!drink
 
   if (!dinner || !kind || !drink) {
     return res.status(400).json({ ok: false, error: 'Выбор не распознан' })
   }
 
-  // Уточнение имеет смысл только для алкоголя.
-  const drinkNote =
-    body.drinkKind === 'alcohol'
-      ? trim(body.drinkNote, CATALOG.limits.drinkNote)
-      : ''
-
   const lines = [
     '✦ <b>Ответ на приглашение</b>',
     '',
     `🍽 <b>Ужин:</b> ${escapeHtml(dinner)}`,
-    `🥂 <b>Напитки:</b> ${escapeHtml(drink)} (${escapeHtml(kind.toLowerCase())})`,
+    `🥂 <b>Напитки:</b> ${escapeHtml(drink)} (${
+      drinkIsCustom ? 'свой вариант, ' : ''
+    }${escapeHtml(kind.toLowerCase())})`,
   ]
-  if (drinkNote) lines.push(`🍾 <b>Уточнение:</b> ${escapeHtml(drinkNote)}`)
   lines.push('', `<i>${escapeHtml(stamp())}</i>`)
 
   const text = lines.join('\n')

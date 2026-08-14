@@ -8,7 +8,7 @@ import {
   DRINK_KINDS,
   DRINKS,
   DINNER_CUSTOM_LIMIT,
-  DRINK_NOTE_LIMIT,
+  DRINK_CUSTOM_LIMIT,
   dinnerLabel,
   soupLabel,
   drinkLabel,
@@ -57,8 +57,8 @@ for (const kind of DRINK_KINDS) {
 // Лимиты.
 if (CATALOG.limits.dinnerCustom !== DINNER_CUSTOM_LIMIT)
   problems.push(`лимит своего варианта: фронт ${DINNER_CUSTOM_LIMIT}, сервер ${CATALOG.limits.dinnerCustom}`)
-if (CATALOG.limits.drinkNote !== DRINK_NOTE_LIMIT)
-  problems.push(`лимит уточнения: фронт ${DRINK_NOTE_LIMIT}, сервер ${CATALOG.limits.drinkNote}`)
+if (CATALOG.limits.drinkCustom !== DRINK_CUSTOM_LIMIT)
+  problems.push(`лимит своего напитка: фронт ${DRINK_CUSTOM_LIMIT}, сервер ${CATALOG.limits.drinkCustom}`)
 
 if (problems.length) {
   console.error('Справочники расходятся:\n')

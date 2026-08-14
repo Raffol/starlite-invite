@@ -86,8 +86,12 @@ export const DAYS = [
 ]
 
 export const DINNER_CUSTOM_LIMIT = 300
-// Уточнение появляется только при выборе алкоголя.
-export const DRINK_NOTE_LIMIT = 80
+// Своё поле для напитка — альтернатива карточке, как и у ужина.
+export const DRINK_CUSTOM_LIMIT = 80
+
+// Фиксированные детали вечера: показываются на титуле и на финальном экране.
+export const DATE_LABEL = 'Воскресенье'
+export const TIME_LABEL = '18:20'
 
 function find(list, id) {
   return list.find((item) => item.id === id) || null
