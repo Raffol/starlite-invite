@@ -198,7 +198,7 @@ async function send() {
           </div>
           <h1 class="display title-xl center">Ужин под звёздами</h1>
           <p class="lede center">
-            Вечер уже продума. Осталось два вопроса: ужин и напитки
+            Вечер уже продуман. Осталось два вопроса: ужин и напитки
             Остальное я беру на себя.
           </p>
           <div class="actions center-actions">
