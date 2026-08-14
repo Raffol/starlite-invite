@@ -1,13 +1,9 @@
-import {
-  DINNER_CUSTOM_LIMIT,
-  SOUP_DINNER_ID,
-  DRINK_NOTE_LIMIT,
-  dinnerLabel,
-  soupLabel,
-  drinkLabel,
-  drinkKindLabel,
-  dayLabel,
-} from '../shared/options.js'
+// Справочник вариантов подключается внутри обработчика (см. loadOptions):
+// при статическом импорте отсутствие файла в бандле роняет функцию целиком
+// и Vercel отдаёт FUNCTION_INVOCATION_FAILED вместо внятного ответа.
+async function loadOptions() {
+  return import('../shared/options.js')
+}
 
 // Простейшая защита от «шаловливых рук»: не больше 5 отправок с одного IP
 // за 10 минут в пределах одного тёплого инстанса функции.
@@ -44,8 +40,8 @@ export default async function handler(req, res) {
     return res.status(405).json({ ok: false, error: 'Нужен POST-запрос' })
   }
 
-  const token = process.env.8984819124:AAGK6m_atI9HOUunw-G2sjjgAv3HYFN_0Mc
-  const chatIds = (process.env.912419291 || '')
+  const token = process.env.TELEGRAM_BOT_TOKEN
+  const chatIds = (process.env.TELEGRAM_CHAT_ID || '')
     .split(',')
     .map((id) => id.trim())
     .filter(Boolean)
@@ -64,6 +60,27 @@ export default async function handler(req, res) {
       .status(429)
       .json({ ok: false, error: 'Слишком много отправок, подожди немного' })
   }
+
+  let opts
+  try {
+    opts = await loadOptions()
+  } catch (err) {
+    console.error('Не удалось загрузить shared/options.js:', err)
+    return res.status(500).json({
+      ok: false,
+      error: 'На сервере нет shared/options.js — проверь, что папка попала в деплой',
+    })
+  }
+  const {
+    DINNER_CUSTOM_LIMIT,
+    SOUP_DINNER_ID,
+    DRINK_NOTE_LIMIT,
+    dinnerLabel,
+    soupLabel,
+    drinkLabel,
+    drinkKindLabel,
+    dayLabel,
+  } = opts
 
   const body = typeof req.body === 'string' ? safeParse(req.body) : req.body || {}
 
