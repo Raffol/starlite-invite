@@ -40,17 +40,25 @@ export default async function handler(req, res) {
     return res.status(405).json({ ok: false, error: 'Нужен POST-запрос' })
   }
 
-  const token = process.env.TELEGRAM_BOT_TOKEN
-  const chatIds = (process.env.TELEGRAM_CHAT_ID || '')
+  const token = process.env.8984819124:AAGK6m_atI9HOUunw-G2sjjgAv3HYFN_0Mc
+  const chatIds = (process.env.912419291 || '')
     .split(',')
     .map((id) => id.trim())
     .filter(Boolean)
 
   if (!token || chatIds.length === 0) {
-    console.error('Отсутствуют TELEGRAM_BOT_TOKEN или TELEGRAM_CHAT_ID')
-    return res
-      .status(500)
-      .json({ ok: false, error: 'Бот не настроен на сервере' })
+    // Называем конкретную переменную: так видно, что именно не доехало до Vercel.
+    const missing = [
+      !token && 'TELEGRAM_BOT_TOKEN',
+      chatIds.length === 0 && 'TELEGRAM_CHAT_ID',
+    ]
+      .filter(Boolean)
+      .join(' и ')
+    console.error(`Не заданы переменные окружения: ${missing}`)
+    return res.status(500).json({
+      ok: false,
+      error: `На сервере не задано: ${missing} (добавь в Vercel и нажми Redeploy)`,
+    })
   }
 
   const ip =
