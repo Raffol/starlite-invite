@@ -55,9 +55,9 @@ watch(drinkCustom, (value) => {
 const customDrink = computed(() => drinkCustom.value.trim())
 
 const drinkPlaceholder = computed(() =>
-  drinkKind.value === 'alcohol'
-    ? 'Например: апероль шприц или что-то местное'
-    : 'Например: морс, кола или свежий сок',
+    drinkKind.value === 'alcohol'
+        ? 'Например: апероль шприц или что-то местное'
+        : 'Например: морс, кола или свежий сок',
 )
 
 // Карточка и своё поле исключают друг друга: ответ всегда один.
@@ -86,7 +86,7 @@ const canContinue = computed(() => {
   }
   if (STEPS[step.value] === 'drinks')
     return (
-      !!drinkKind.value && (!!drink.value || customDrink.value.length >= 2)
+        !!drinkKind.value && (!!drink.value || customDrink.value.length >= 2)
     )
   return true
 })
@@ -95,23 +95,22 @@ const summary = computed(() => [
   {
     label: 'Ужин',
     value: needsSoup.value
-      ? `Суп — ${(soupLabel(soup.value) || '').toLowerCase()}`
-      : dinner.value
-        ? dinnerLabel(dinner.value)
-        : `${customDinner.value} — свой вариант`,
+        ? `Суп — ${(soupLabel(soup.value) || '').toLowerCase()}`
+        : dinner.value
+            ? dinnerLabel(dinner.value)
+            : `${customDinner.value} — свой вариант`,
   },
   {
     label: 'Напитки',
     value: [
       drink.value
-        ? drinkLabel(drinkKind.value, drink.value)
-        : `${customDrink.value} — свой вариант`,
+          ? drinkLabel(drinkKind.value, drink.value)
+          : `${customDrink.value} — свой вариант`,
       drinkKindLabel(drinkKind.value),
     ]
-      .filter(Boolean)
-      .join(' · '),
+        .filter(Boolean)
+        .join(' · '),
   },
-  { label: 'Когда', value: `${DATE_LABEL}, к ${TIME_LABEL}` },
 ])
 
 function next() {
@@ -145,9 +144,9 @@ async function send() {
       // Не JSON — значит запрос до серверной функции не дошёл.
       const local = ['localhost', '127.0.0.1'].includes(location.hostname)
       throw new Error(
-        local
-          ? 'Локально функции нет: в npm run dev её не поднимают — запусти vercel dev'
-          : `Сервер ответил не JSON (код ${res.status}) — папка api/ не попала в деплой`,
+          local
+              ? 'Локально функции нет: в npm run dev её не поднимают — запусти vercel dev'
+              : `Сервер ответил не JSON (код ${res.status}) — папка api/ не попала в деплой`,
       )
     }
     const data = await res.json().catch(() => ({}))
@@ -157,9 +156,9 @@ async function send() {
     step.value = STEPS.indexOf('sent')
   } catch (e) {
     error.value =
-      e.message === 'Failed to fetch'
-        ? 'Нет связи с сервером. Проверь интернет и нажми ещё раз.'
-        : `${e.message}. Попробуй ещё раз.`
+        e.message === 'Failed to fetch'
+            ? 'Нет связи с сервером. Проверь интернет и нажми ещё раз.'
+            : `${e.message}. Попробуй ещё раз.`
   } finally {
     sending.value = false
   }
@@ -173,16 +172,16 @@ async function send() {
     <div class="frame">
       <!-- Прогресс: два шага-вопроса -->
       <div
-        v-if="step > 0 && STEPS[step] !== 'sent'"
-        class="progress"
-        aria-hidden="true"
+          v-if="step > 0 && STEPS[step] !== 'sent'"
+          class="progress"
+          aria-hidden="true"
       >
         <span class="progress-line"></span>
         <span
-          v-for="i in TOTAL_STEPS"
-          :key="i"
-          class="pip"
-          :class="{ done: i < step, now: i === step }"
+            v-for="i in TOTAL_STEPS"
+            :key="i"
+            class="pip"
+            :class="{ done: i < step, now: i === step }"
         ></span>
       </div>
 
@@ -193,7 +192,7 @@ async function send() {
           <div class="crest" aria-hidden="true">
             <svg viewBox="0 0 100 100">
               <path
-                d="M50 6 C54 33 67 46 94 50 C67 54 54 67 50 94 C46 67 33 54 6 50 C33 46 46 33 50 6 Z"
+                  d="M50 6 C54 33 67 46 94 50 C67 54 54 67 50 94 C46 67 33 54 6 50 C33 46 46 33 50 6 Z"
               />
             </svg>
           </div>
@@ -202,10 +201,6 @@ async function send() {
             Вечер уже задуман. Осталось два вопроса — ужин и напитки, —
             остальное я беру на себя.
           </p>
-          <div class="when">
-            <p class="eyebrow">Когда</p>
-            <p class="when-value">{{ DATE_LABEL }}, будь готова к {{ TIME_LABEL }}</p>
-          </div>
           <div class="actions center-actions">
             <button class="btn" @click="next">Открыть приглашение</button>
           </div>
@@ -218,13 +213,13 @@ async function send() {
           <p class="hint">Выбери из идей ниже <em>или</em> напиши своими словами — что-то одно.</p>
           <div class="list" :class="{ 'is-muted': customDinner.length > 0 }">
             <ChoiceCard
-              v-for="opt in DINNERS"
-              :key="opt.id"
-              :title="opt.title"
-              :subtitle="opt.subtitle"
-              :glyph="opt.glyph"
-              :selected="dinner === opt.id"
-              @select="pickDinner(opt.id)"
+                v-for="opt in DINNERS"
+                :key="opt.id"
+                :title="opt.title"
+                :subtitle="opt.subtitle"
+                :glyph="opt.glyph"
+                :selected="dinner === opt.id"
+                @select="pickDinner(opt.id)"
             />
           </div>
 
@@ -233,13 +228,13 @@ async function send() {
               <p class="eyebrow sub-label">Какой суп?</p>
               <div class="list">
                 <ChoiceCard
-                  v-for="opt in SOUPS"
-                  :key="opt.id"
-                  :title="opt.title"
-                  :subtitle="opt.subtitle"
-                  :glyph="opt.glyph"
-                  :selected="soup === opt.id"
-                  @select="soup = opt.id"
+                    v-for="opt in SOUPS"
+                    :key="opt.id"
+                    :title="opt.title"
+                    :subtitle="opt.subtitle"
+                    :glyph="opt.glyph"
+                    :selected="soup === opt.id"
+                    @select="soup = opt.id"
                 />
               </div>
             </div>
@@ -249,11 +244,11 @@ async function send() {
             <label class="field">
               <span class="eyebrow">Или напиши, чего хочется (по желанию)</span>
               <textarea
-                v-model="dinnerCustom"
-                class="input textarea"
-                :maxlength="DINNER_CUSTOM_LIMIT"
-                rows="3"
-                placeholder="Например: том-ям, стейк или что-нибудь сладкое"
+                  v-model="dinnerCustom"
+                  class="input textarea"
+                  :maxlength="DINNER_CUSTOM_LIMIT"
+                  rows="3"
+                  placeholder="Например: том-ям, стейк или что-нибудь сладкое"
               ></textarea>
               <span class="counter">{{ dinnerCustom.length }} / {{ DINNER_CUSTOM_LIMIT }}</span>
             </label>
@@ -272,13 +267,13 @@ async function send() {
           <p class="hint">Сначала вид, потом карточка <em>или</em> своё поле.</p>
           <div class="list two">
             <ChoiceCard
-              v-for="opt in DRINK_KINDS"
-              :key="opt.id"
-              :title="opt.title"
-              :subtitle="opt.subtitle"
-              :glyph="opt.glyph"
-              :selected="drinkKind === opt.id"
-              @select="drinkKind = opt.id"
+                v-for="opt in DRINK_KINDS"
+                :key="opt.id"
+                :title="opt.title"
+                :subtitle="opt.subtitle"
+                :glyph="opt.glyph"
+                :selected="drinkKind === opt.id"
+                @select="drinkKind = opt.id"
             />
           </div>
 
@@ -287,27 +282,27 @@ async function send() {
               <p class="eyebrow sub-label">Уточним</p>
               <div class="list" :class="{ 'is-muted': customDrink.length > 0 }">
                 <ChoiceCard
-                  v-for="opt in drinkOptions"
-                  :key="opt.id"
-                  :title="opt.title"
-                  :subtitle="opt.subtitle"
-                  :glyph="opt.glyph"
-                  :selected="drink === opt.id"
-                  @select="pickDrink(opt.id)"
+                    v-for="opt in drinkOptions"
+                    :key="opt.id"
+                    :title="opt.title"
+                    :subtitle="opt.subtitle"
+                    :glyph="opt.glyph"
+                    :selected="drink === opt.id"
+                    @select="pickDrink(opt.id)"
                 />
               </div>
 
               <label
-                class="field field-tight"
-                :class="{ 'is-muted': !!drink }"
+                  class="field field-tight"
+                  :class="{ 'is-muted': !!drink }"
               >
                 <span class="eyebrow">Или напиши, что налить (по желанию)</span>
                 <input
-                  v-model="drinkCustom"
-                  type="text"
-                  class="input"
-                  :maxlength="DRINK_CUSTOM_LIMIT"
-                  :placeholder="drinkPlaceholder"
+                    v-model="drinkCustom"
+                    type="text"
+                    class="input"
+                    :maxlength="DRINK_CUSTOM_LIMIT"
+                    :placeholder="drinkPlaceholder"
                 />
                 <span class="counter">
                   {{ drinkCustom.length }} / {{ DRINK_CUSTOM_LIMIT }}
@@ -350,9 +345,12 @@ async function send() {
           <h2 class="display title-md center">Ответ отправлен</h2>
           <p class="lede center on-night">
             Уведомление уже у меня. Место и столик — моя забота.
-            От тебя нужно одно: {{ DATE_LABEL.toLowerCase() }}, быть готовой к {{ TIME_LABEL }}.
           </p>
-          <p class="signoff center">До встречи под звёздами ✦</p>
+          <div class="when on-night">
+            <p class="eyebrow">Когда</p>
+            <p class="when-value">{{ DATE_LABEL }}, будь готова к {{ TIME_LABEL }}</p>
+          </div>
+          <p class="signoff center">До встречи ✦</p>
         </OrnatePanel>
       </Transition>
     </div>
@@ -391,10 +389,10 @@ async function send() {
   width: 8rem;
   height: 1px;
   background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(211, 188, 142, 0.35),
-    transparent
+      90deg,
+      transparent,
+      rgba(211, 188, 142, 0.35),
+      transparent
   );
 }
 
@@ -540,6 +538,18 @@ async function send() {
   font-weight: 600;
   margin: 0.35rem 0 0;
   color: var(--ink);
+}
+
+.when.on-night {
+  border-top-color: rgba(211, 188, 142, 0.4);
+}
+
+.when.on-night .eyebrow {
+  color: var(--gold);
+}
+
+.when.on-night .when-value {
+  color: var(--parchment-2);
 }
 
 .hint em {
